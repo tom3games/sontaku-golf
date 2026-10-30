@@ -924,6 +924,11 @@ on('#bHow', () => { Snd.sfx('tap'); go('vHow') })
 on('#bHowBack', () => { Snd.sfx('tap'); go('vTitle') })
 on('#bAgain', () => startGame())
 on('#bSave', () => saveImage(true))
+// Xでポスト: クリックの同期処理内で開く（ポップアップブロック回避）
+const PUB_URL = 'https://tom3games.github.io/sontaku-golf/'
+function xText() { const f = S.final; if (!f) return ''; const [a, b] = danLabel(f); return T('xText').replace('{dan}', a + b).replace('{pos}', S.lang === 'ja' ? f.ord.ja : f.ord.en) }
+function xUrl() { return 'https://x.com/intent/post?text=' + encodeURIComponent(xText()) + '&url=' + encodeURIComponent(PUB_URL) }
+on('#bX', () => { window.open(xUrl(), '_blank', 'noopener') })
 on('#bTitle', () => { Snd.sfx('tap'); toTitle() })
 on('#bLang', () => { S.lang = S.lang === 'ja' ? 'en' : 'ja'; store.set('lang', S.lang); applyLang() })
 on('#bMute', () => { Snd.setMute(!Snd.muted); $('#icOn').hidden = Snd.muted; $('#icOff').hidden = !Snd.muted; store.set('mute', Snd.muted ? '1' : '0') })
@@ -956,7 +961,7 @@ window.__sgReady = true
 // 検証用の窓口
 window.sg = {
   S, get H() { return H }, D, camera, pipCam, drawFace, camPos, camLook, bossSet, mySet, renderer, scene, Snd, solve, runShot, judge, surfAt: (x, z) => surfAt(H, x, z), tierOf: (x, z) => tierOf(H, x, z),
-  start: seed => startGame(seed), startGame, toTitle, saveImage, finish, shoot, shotPress, fire, verdict, setRing,
+  start: seed => startGame(seed), startGame, toTitle, saveImage, xText, xUrl, PUB_URL, finish, shoot, shotPress, fire, verdict, setRing,
   // 上手い人の狙い: 部長の距離 + margin の所に止める向きと強さ（実際の物理で解く）
   ideal(margin = 1.2) {
     const bb = S.bossBall, pin = H.pin, r = bb.dist + margin

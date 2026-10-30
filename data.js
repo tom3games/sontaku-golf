@@ -31,7 +31,8 @@ window.SG_DATA = {
   TXT: {
     ja: {
       title: '忖度ゴルフ', titleSub: 'LET THE BOSS WIN', tagline: '部長に「ほんの少しだけ」負けろ。',
-      start: '接待に行く', how: '遊び方', back: '戻る', again: 'もう一回', save: '辞令を保存', toTitle: 'タイトル',
+      start: '接待に行く', how: '遊び方', back: '戻る', again: 'もう一回', save: '辞令を保存', toTitle: 'タイトル', postX: 'Xでポスト',
+      xText: '忖度ゴルフで忖度力{dan}、辞令は「{pos}」でした #忖度ゴルフ',
       company: '株式会社 忖度商事', bossName: '権田部長', you: 'あなた',
       lead: '今日の接待ゴルフ、わかっとるな？ ワシに勝つなよ。でも、わざと負けるのもバレるからな。',
       howT: '遊び方',
@@ -58,7 +59,8 @@ window.SG_DATA = {
     },
     en: {
       title: 'LET THE BOSS WIN', titleSub: 'SONTAKU GOLF', tagline: 'Lose to the boss. Just barely.',
-      start: 'Tee Off', how: 'How to play', back: 'Back', again: 'Play again', save: 'Save image', toTitle: 'Title',
+      start: 'Tee Off', how: 'How to play', back: 'Back', again: 'Play again', save: 'Save image', toTitle: 'Title', postX: 'Post on X',
+      xText: 'LET THE BOSS WIN: Flattery rank {dan}. New job: "{pos}" #LetTheBossWin',
       company: 'Sontaku Trading Co.', bossName: 'Boss Gonda', you: 'You',
       lead: "You know the deal today, right? Don't you dare beat me. But don't lose on purpose either. I'll know.",
       howT: 'How to play',

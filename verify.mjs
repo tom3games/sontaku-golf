@@ -52,6 +52,33 @@ const glVariance = p => p.evaluate(() => {
   let s = 0, s2 = 0, n = 0; for (let i = 0; i < d.length; i += 4 * 7) { const v = d[i] * .3 + d[i + 1] * .59 + d[i + 2] * .11; s += v; s2 += v * v; n++ }
   return Math.round(s2 / n - (s / n) ** 2)
 })
+// ---- Xでポスト の検査道具
+// window.open をスタブして押す → 開いたURLを分解して確かめる
+const xStub = async (pg, ns, pub, tag) => {
+  await pg.evaluate(() => { window.__opened = []; if (!window.__origOpen) window.__origOpen = window.open; window.open = (...a) => { window.__opened.push(a); return null } })
+  const vis = await pg.evaluate(() => { const b = document.querySelector('#bX'), r = b.getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height), inView: r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth, clip: b.scrollWidth > b.clientWidth + 1, bg: getComputedStyle(b).backgroundColor, label: b.textContent.trim(), svg: !!b.querySelector('svg path') } })
+  await pg.click('#bX')
+  const r = await pg.evaluate(ns => ({ opened: window.__opened, text: window[ns].xText(), url: window[ns].xUrl() }), ns)
+  await pg.evaluate(() => { window.open = window.__origOpen })
+  expect(r.opened.length === 1, r)
+  const [u, target, feat] = r.opened[0], q = new URL(u)
+  const text = q.searchParams.get('text'), url = q.searchParams.get('url')
+  expect(u.startsWith('https://x.com/intent/post?') && target === '_blank' && /noopener/.test(feat || '') && u === r.url, r.opened[0])
+  expect(text === r.text && text.includes(tag) && (text.match(/#/g) || []).length === 1 && url === pub && !/https?:\/\//.test(text), { text, url })
+  expect(vis.inView && !vis.clip && vis.svg && vis.bg === 'rgb(0, 0, 0)' && vis.h >= 36, vis)
+  return { label: vis.label, text }
+}
+// 本物のクリックで新しいタブ（popup）が開く。x.com へは出ずにダミーを返す
+const xPopup = async (pg, pub) => {
+  await pg.context().route(/^https:\/\/x\.com\//, r => r.fulfill({ status: 200, contentType: 'text/html', body: '<title>x</title>ok' }))
+  const [pop] = await Promise.all([pg.waitForEvent('popup', { timeout: 8000 }), pg.click('#bX')])
+  await pop.waitForLoadState().catch(() => {})
+  const u = new URL(pop.url()); await pop.close()
+  expect(u.origin + u.pathname === 'https://x.com/intent/post' && u.searchParams.get('url') === pub && u.searchParams.get('text'), pop.url())
+  return u.searchParams.get('text')
+}
+// 結果画面のボタンの文字が切れていない
+const btnClip = pg => pg.evaluate(() => [...document.querySelectorAll('#vResult button')].filter(b => b.offsetParent && b.scrollWidth > b.clientWidth + 1).map(b => b.id + ':' + b.scrollWidth + '>' + b.clientWidth))
 const SIZES = [[360, 640, 'small'], [390, 844, 'phone'], [844, 390, 'land'], [667, 375, 'land-se'], [768, 1024, 'tab'], [1440, 900, 'pc']]
 // ページ内で使う: 台本で進める道具
 const HELP = () => {
@@ -164,6 +191,21 @@ await t('保存ボタンでダウンロードが始まる', async () => {
   expect(dl.suggestedFilename() === 'sontaku-golf.png', dl.suggestedFilename()); return dl.suggestedFilename()
 })
 await p.screenshot({ path: ROOT + '/shots/result-ja.png' })
+const PUB = 'https://tom3games.github.io/sontaku-golf/'
+await t('Xでポスト: 日本語（ボタンが見える・x.com/intent/post・本文に段位と辞令とハッシュタグ・url=公開URL）', async () => {
+  const r = await xStub(p, 'sg', PUB, '#忖度ゴルフ')
+  const pos = await p.evaluate(() => document.querySelector('#oPos').textContent)
+  expect(r.label === 'Xでポスト' && r.text.includes(pos) && /忖度力/.test(r.text), r); return r.text
+})
+await t('Xでポスト: 本物のクリックで新しいタブが開く', async () => { const tx = await xPopup(p, PUB); expect(/#忖度ゴルフ/.test(tx), tx); return tx.length })
+await t('Xでポスト: 英語', async () => {
+  await p.click('#bLang')
+  const r = await xStub(p, 'sg', PUB, '#LetTheBossWin')
+  const pos = await p.evaluate(() => document.querySelector('#oPos').textContent)
+  await p.screenshot({ path: ROOT + '/shots/result-en-x.png' })
+  await p.click('#bLang')
+  expect(r.label === 'Post on X' && r.text.includes(pos) && !/[ぁ-んァ-ン一-龥]/.test(r.text), r); return r.text
+})
 await t('英語に切り替わる（タイトル・辞令・判定）', async () => {
   await p.click('#bLang')
   const r = await p.evaluate(() => ({ pos: document.querySelector('#oPos').textContent, hk: document.querySelector('#hanko').textContent, lang: document.documentElement.lang }))
@@ -223,6 +265,9 @@ for (const [w, h, name] of SIZES) {
   views.verdict = await fit(q); await q.screenshot({ path: `${ROOT}/shots/fit-${name}-verdict.png` })
   await q.evaluate(() => { __play(21, 'good'); sg.dbg.pause(false) }); await q.waitForTimeout(1600)
   views.result = await fit(q); await q.screenshot({ path: `${ROOT}/shots/fit-${name}-result.png` })
+  const clip = await btnClip(q)
+  await t(`${name}: 結果画面のボタンの文字が切れない`, async () => { expect(!clip.length, clip) })
+  await q.click('#bLang'); await q.waitForTimeout(150); views.resultEn = await fit(q); await t(`${name}: 英語の結果画面のボタンの文字が切れない`, async () => { const c = await btnClip(q); expect(!c.length, c) }); await q.screenshot({ path: `${ROOT}/shots/fit-${name}-result-en.png` }); await q.click('#bLang')
   for (const [v, r] of Object.entries(views)) await t(`一画面に収まる ${name} ${w}x${h} ${v}`, async () => { expect(!r.over.length, r) })
   await t(`${name}: はみ出し・エラーなし`, async () => { const o = await overflow(q); expect(o.sw <= o.W && !o.bad.length && !q.errs.length, JSON.stringify(o) + q.errs.join('|')) })
   await q.close()

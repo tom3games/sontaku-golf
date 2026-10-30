@@ -185,6 +185,11 @@ html[lang=en] .order .oh{letter-spacing:.06em;padding-left:0;font-size:clamp(18p
 .holes .g{background:#c99a12;color:#fff}.holes .ok{background:#2f8d48}.holes .ng{background:#a8303a}.holes .so{background:#566477}
 #vResult .row .btn{min-height:50px;font-size:16px}
 #vResult .btn.red{min-height:56px;font-size:19px}
+#vResult .row>.btn.red{flex:1.7}
+.btn.xpost{background:#000;color:#fff;box-shadow:0 5px 0 #3a3a3a,0 10px 18px rgba(0,0,0,.25)}
+.btn.xpost:active{box-shadow:0 1px 0 #3a3a3a}
+.btn.xpost svg.xl{width:20px;height:20px;fill:#fff;stroke:none}
+@media (max-width:400px){#vResult .row .btn{padding:0 10px;gap:6px}}
 
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--paper);color:var(--ink);font-weight:900;padding:10px 18px;border-radius:99px;z-index:70;box-shadow:0 4px 12px rgba(0,0,0,.4);border:3px solid var(--ink)}
 #boot-err{position:fixed;inset:auto 8px 8px 8px;z-index:99;background:#fff;color:#b00;font:12px/1.4 monospace;white-space:pre-wrap;padding:10px;border-radius:8px}
@@ -242,6 +247,7 @@ html[lang=en] .order .oh{letter-spacing:.06em;padding-left:0;font-size:clamp(18p
   #vResult .btns{display:flex;flex-direction:column;gap:6px}
   #vResult .row .btn{min-height:40px;font-size:13px;padding:0 8px;gap:4px;white-space:nowrap}
   #vResult .row .btn svg{width:18px;height:18px}
+  #vResult .row .btn svg.xl{width:16px;height:16px}
   #vResult .btn.red{min-height:44px;font-size:16px}
 }
 @media (max-height:420px) and (min-aspect-ratio:1/1){
@@ -339,8 +345,8 @@ html[lang=en] .order .oh{letter-spacing:.06em;padding-left:0;font-size:clamp(18p
       <div class="holes" id="rHoles"></div>
     </div>
     <div class="btns">
-      <button class="btn red" id="bAgain" type="button"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2"/><path d="M4 4v5h5"/></svg><span data-t="again"></span></button>
-      <div class="row" style="margin-top:8px"><button class="btn gold" id="bSave" type="button"><svg viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg><span data-t="save"></span></button><button class="btn ghost" id="bTitle" type="button" data-t="toTitle"></button></div>
+      <div class="row"><button class="btn red" id="bAgain" type="button"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2"/><path d="M4 4v5h5"/></svg><span data-t="again"></span></button><button class="btn ghost" id="bTitle" type="button" data-t="toTitle"></button></div>
+      <div class="row" style="margin-top:8px"><button class="btn gold" id="bSave" type="button"><svg viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg><span data-t="save"></span></button><button class="btn xpost" id="bX" type="button"><svg class="xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.65l-5.21-6.82-5.97 6.82H1.68l7.73-8.84L1.25 2.25h6.83l4.71 6.23zm-1.16 17.52h1.83L7.08 4.13H5.12z"/></svg><span data-t="postX"></span></button></div>
     </div>
   </div>
 </main>
@@ -367,8 +373,8 @@ html[lang=en] .order .oh{letter-spacing:.06em;padding-left:0;font-size:clamp(18p
   },8000);
 })();
 </script>
-<script src="data.js?v=1"></script>
-<script src="snd.js?v=1"></script>
-<script type="module" src="game.js?v=1"></script>
+<script src="data.js?v=2"></script>
+<script src="snd.js?v=2"></script>
+<script type="module" src="game.js?v=2"></script>
 </body>
 </html>
