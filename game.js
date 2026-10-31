@@ -790,6 +790,17 @@ function finish() {
   setPhase('none'); go('vResult'); fillResult(true)
 }
 function danLabel(f) { return f.dan >= 10 ? [T('meijin'), ''] : f.dan <= 0 ? [T('mudan'), ''] : [String(f.dan), T('danUnit')] }
+// ハンコの字を丸の内側（内接する正方形）に収める。単語の途中では折らない（CSS で keep-all）
+function fitHanko() {
+  const hk = $('#hanko'), sp = hk.firstElementChild; if (!sp || !hk.offsetWidth) return
+  hk.style.fontSize = ''
+  const round = S.lang !== 'en', cs = getComputedStyle(hk), limW = round ? hk.clientWidth * 0.74 : hk.clientWidth - parseFloat(cs.paddingLeft) * 2 - 6, limH = round ? limW : 999
+  let fs = parseFloat(cs.fontSize)
+  while (fs > 8 && (sp.offsetWidth > limW || sp.offsetHeight > limH)) { fs -= 1; hk.style.fontSize = fs + 'px' }
+}
+addEventListener('resize', () => { if (S.view === 'vResult') fitHanko() })
+// 見出し用の字体は使われた時に読み込まれる。読み込み後に幅が変わるので測り直す
+try { document.fonts.ready.then(() => fitHanko()); document.fonts.addEventListener('loadingdone', () => fitHanko()) } catch (e) {}
 function fillResult(anim) {
   const f = S.final
   if (f.lineLang !== S.lang) { f.line = pick(D.BOSS[S.lang][f.lineKey]); f.lineLang = S.lang }
@@ -800,8 +811,10 @@ function fillResult(anim) {
   $('#rDan').style.fontSize = a.length > 2 ? '0.62em' : ''
   $('#rMood').textContent = f.mood + ' / 100'; $('#rMeter i').style.width = f.mood + '%'; $('#rMeter').classList.toggle('low', f.mood < 30)
   $('#rHoles').innerHTML = S.results.map((r, i) => { const c = r.v === 'tight' || r.v === 'perfect' ? 'g' : r.v === 'good' ? 'ok' : r.v === 'hiyari' || r.v === 'loose' ? 'so' : 'ng'; const m = r.tB !== r.tP ? '--' : (r.m >= 0 ? '+' : '') + yd(r.m); return `<div class="${c}">${i + 1}<b>${m}</b></div>` }).join('')
-  const hk = $('#hanko'); hk.textContent = T('stamp_' + f.ord.stamp); hk.className = 'hanko' + (f.ord.stamp === 'big' ? ' big' : '')
-  if (S.lang === 'en') hk.style.fontSize = '0.8em'; else hk.style.fontSize = ''
+  // 言語切替（anim なし）では押した状態のまま。slam を外すと寸法を測った時に押す動きが最初からやり直しになる
+  const hk = $('#hanko'); hk.className = 'hanko' + (f.ord.stamp === 'big' ? ' big' : '') + (!anim && hk.classList.contains('slam') ? ' slam' : '')
+  hk.innerHTML = ''; const hs = document.createElement('span'); hs.textContent = T('stamp_' + f.ord.stamp).replace(/ /g, '\n'); hk.append(hs)
+  fitHanko()
   if (anim) {
     Snd.sfx('drum')
     hk.style.opacity = 0
@@ -961,7 +974,7 @@ window.__sgReady = true
 // 検証用の窓口
 window.sg = {
   S, get H() { return H }, D, camera, pipCam, drawFace, camPos, camLook, bossSet, mySet, renderer, scene, Snd, solve, runShot, judge, surfAt: (x, z) => surfAt(H, x, z), tierOf: (x, z) => tierOf(H, x, z),
-  start: seed => startGame(seed), startGame, toTitle, saveImage, xText, xUrl, PUB_URL, finish, shoot, shotPress, fire, verdict, setRing,
+  start: seed => startGame(seed), startGame, toTitle, saveImage, xText, xUrl, PUB_URL, finish, fillResult, applyLang, fitHanko, shoot, shotPress, fire, verdict, setRing,
   // 上手い人の狙い: 部長の距離 + margin の所に止める向きと強さ（実際の物理で解く）
   ideal(margin = 1.2) {
     const bb = S.bossBall, pin = H.pin, r = bb.dist + margin

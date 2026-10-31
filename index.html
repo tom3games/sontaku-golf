@@ -167,15 +167,22 @@ html[lang=en] .order .oh{letter-spacing:.06em;padding-left:0;font-size:clamp(18p
 .order .pos{font-family:var(--disp);font-size:clamp(19px,min(6.2vw,3.8vh),30px);line-height:1.3;color:var(--red-dk);margin:clamp(4px,.8vh,8px) 0;padding:0 4px}
 .order .end{font-weight:900;font-size:13px;text-align:right}
 .order .dt{font-weight:800;font-size:11px;color:var(--sub);text-align:left;margin-top:4px}
-.hanko{position:absolute;right:12px;top:10px;width:clamp(78px,min(24vw,14vh),110px);aspect-ratio:1;border-radius:50%;border:5px solid var(--red);color:var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:clamp(17px,min(5.4vw,3.2vh),25px);line-height:1;transform:rotate(-14deg);background:rgba(255,250,240,.35);mix-blend-mode:multiply;box-shadow:inset 0 0 0 3px rgba(255,250,240,.6),inset 0 0 0 6px var(--red);text-align:center;padding:6px;opacity:0}
+.order .foot{display:flex;align-items:center;gap:10px;margin-top:2px}
+.order .fl{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.order .fl .dt{margin-top:0}
+.hanko{position:relative;flex:none;margin-right:2px;width:clamp(64px,min(20vw,11vh),96px);overflow-wrap:normal;word-break:keep-all;aspect-ratio:1;border-radius:50%;border:5px solid var(--red);color:var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:clamp(17px,min(5.4vw,3.2vh),25px);line-height:1;transform:rotate(var(--hr,-14deg));background:rgba(255,250,240,.35);mix-blend-mode:multiply;box-shadow:inset 0 0 0 3px rgba(255,250,240,.6),inset 0 0 0 6px var(--red);text-align:center;padding:6px;opacity:0}
+.hanko span{display:block;width:max-content;white-space:pre-line}
 .hanko.big{color:#c4142e;border-color:#c4142e}
 .hanko.slam{animation:slam .45s cubic-bezier(.2,1.5,.4,1) both}
-@keyframes slam{0%{transform:rotate(-14deg) scale(3.2);opacity:0}60%{opacity:1}100%{transform:rotate(-14deg) scale(1);opacity:1}}
+@keyframes slam{0%{transform:rotate(var(--hr,-14deg)) scale(3.2);opacity:0}60%{opacity:1}100%{transform:rotate(var(--hr,-14deg)) scale(1);opacity:1}}
+/* 英語は欧米式の四角いゴム印（丸に英単語は入らない） */
+html[lang=en] .hanko{--hr:-6deg;aspect-ratio:auto;width:clamp(118px,min(34vw,22vh),170px);border-radius:8px;padding:5px 8px;letter-spacing:.02em;line-height:1.05}
 .shake{animation:shake .35s linear}
 @keyframes shake{25%{transform:translate(4px,-3px)}50%{transform:translate(-4px,3px)}75%{transform:translate(3px,2px)}}
 .score{background:rgba(20,36,58,.85);color:#fff;border-radius:16px;padding:10px 14px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:center;box-shadow:0 5px 0 rgba(0,0,0,.25)}
 .score .dan{grid-row:1/3;text-align:center;line-height:1}
-.score .dan small{display:block;font-weight:900;font-size:11px;color:#cfe0f5}
+.score .dan{overflow-wrap:normal;word-break:keep-all}
+.score .dan small{display:block;white-space:nowrap;font-weight:900;font-size:11px;color:#cfe0f5}
 .score .dan b{font-family:var(--disp);font-weight:400;font-size:clamp(34px,min(11vw,6vh),50px);color:var(--gold)}
 .score .dan span{font-weight:900;font-size:16px}
 .score .ml{font-size:11px;font-weight:900;color:#cfe0f5;display:flex;justify-content:space-between}
@@ -253,7 +260,8 @@ html[lang=en] .order .oh{letter-spacing:.06em;padding-left:0;font-size:clamp(18p
 @media (max-height:420px) and (min-aspect-ratio:1/1){
   .order .co,.order .dt{display:none}
   .order .oh{font-size:22px}
-  .hanko{width:70px;font-size:15px}
+  .hanko{width:54px;font-size:13px;border-width:4px}
+  html[lang=en] .hanko{width:118px}
 }
 /* PC など広い画面 */
 @media (min-width:900px) and (min-height:700px){
@@ -336,9 +344,7 @@ html[lang=en] .order .oh{letter-spacing:.06em;padding-left:0;font-size:clamp(18p
       <div class="co" data-t="company"></div>
       <div class="to" id="oTo"></div>
       <div class="pos" id="oPos"></div>
-      <div class="end" data-t="orderEnd" id="oEnd"></div>
-      <div class="dt" data-t="date"></div>
-      <div class="hanko" id="hanko"></div>
+      <div class="foot"><div class="fl"><div class="end" data-t="orderEnd" id="oEnd"></div><div class="dt" data-t="date"></div></div><div class="hanko" id="hanko"></div></div>
     </div>
     <div class="score"><div class="dan"><small data-t="dan"></small><b id="rDan"></b><span id="rDanU"></span></div>
       <div><div class="ml"><span data-t="moodEnd"></span><span id="rMood"></span></div><div class="meter" id="rMeter"><i></i></div></div>
@@ -373,8 +379,8 @@ html[lang=en] .order .oh{letter-spacing:.06em;padding-left:0;font-size:clamp(18p
   },8000);
 })();
 </script>
-<script src="data.js?v=2"></script>
-<script src="snd.js?v=2"></script>
-<script type="module" src="game.js?v=2"></script>
+<script src="data.js?v=3"></script>
+<script src="snd.js?v=3"></script>
+<script type="module" src="game.js?v=3"></script>
 </body>
 </html>

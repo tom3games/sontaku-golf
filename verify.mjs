@@ -79,6 +79,38 @@ const xPopup = async (pg, pub) => {
 }
 // 結果画面のボタンの文字が切れていない
 const btnClip = pg => pg.evaluate(() => [...document.querySelectorAll('#vResult button')].filter(b => b.offsetParent && b.scrollWidth > b.clientWidth + 1).map(b => b.id + ':' + b.scrollWidth + '>' + b.clientWidth))
+// ハンコが見出し・辞令本文の文字に重ならない／ハンコの字が単語の途中で折れない・枠からはみ出さない（全辞令 × 日英）
+const HANKO = async () => {
+const hankoCheck = () => {
+  const hk = document.querySelector('#hanko'), r = hk.getBoundingClientRect(), cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2
+  const w = hk.offsetWidth / 2, h = hk.offsetHeight / 2, round = getComputedStyle(hk).borderTopLeftRadius.endsWith('%')
+  const m = /rotate\(([-\d.]+)deg\)/.exec(getComputedStyle(hk).getPropertyValue('--hr') ? 'rotate(' + getComputedStyle(hk).getPropertyValue('--hr').trim() + ')' : 'rotate(-14deg)'), a = -(+m[1]) * Math.PI / 180
+  const inside = (x, y) => { const dx = x - cx, dy = y - cy, lx = dx * Math.cos(a) - dy * Math.sin(a), ly = dx * Math.sin(a) + dy * Math.cos(a); return round ? Math.hypot(lx, ly) < w - 1 : Math.abs(lx) < w - 1 && Math.abs(ly) < h - 1 }
+  const hits = []
+  for (const sel of ['.order .oh', '#oPos', '#oTo', '#oEnd']) {
+    const el = document.querySelector(sel); if (!el || !el.textContent.trim()) continue
+    const rg = document.createRange(); rg.selectNodeContents(el)
+    let n = 0; for (const b of rg.getClientRects()) for (let x = b.left; x <= b.right; x += 2) for (let y = b.top + 2; y <= b.bottom - 2; y += 2) if (inside(x, y)) n++
+    if (n) hits.push(sel + ':' + n)
+  }
+  return hits
+}
+
+  const bad = [], lang0 = sg.S.lang, ord0 = sg.S.final.ord
+  for (const lang of ['ja', 'en']) {
+    sg.S.lang = lang; sg.applyLang()
+    for (const o of sg.D.ORDERS) {
+      sg.S.final.ord = o; sg.fillResult(false); await document.fonts.ready
+      const hk = document.querySelector('#hanko'), sp = hk.firstElementChild, lim = lang === 'en' ? hk.clientWidth : hk.clientWidth * 0.8
+      const hits = hankoCheck(); if (hits.length) bad.push(`${lang}/${o.stamp}/${o.ja.slice(0, 4)} overlap ${hits}`)
+      if (sp.offsetWidth > lim || sp.offsetHeight > lim) bad.push(`${lang}/${o.stamp} clip ${sp.offsetWidth}x${sp.offsetHeight}>${lim}`)
+      const tn = sp.firstChild; let pos = 0
+      for (const wd of tn.textContent.split(/\s/)) { const rg = document.createRange(); rg.setStart(tn, pos); rg.setEnd(tn, pos + wd.length); pos += wd.length + 1; if (new Set([...rg.getClientRects()].map(x => Math.round(x.top))).size > 1) bad.push(`${lang}/${o.stamp} break ${wd}`) }
+    }
+  }
+  sg.S.lang = lang0; sg.applyLang(); sg.S.final.ord = ord0; sg.fillResult(false)
+  return bad
+}
 const SIZES = [[360, 640, 'small'], [390, 844, 'phone'], [844, 390, 'land'], [667, 375, 'land-se'], [768, 1024, 'tab'], [1440, 900, 'pc']]
 // ページ内で使う: 台本で進める道具
 const HELP = () => {
@@ -270,6 +302,7 @@ for (const [w, h, name] of SIZES) {
   await q.click('#bLang'); await q.waitForTimeout(150); views.resultEn = await fit(q); await t(`${name}: 英語の結果画面のボタンの文字が切れない`, async () => { const c = await btnClip(q); expect(!c.length, c) }); await q.screenshot({ path: `${ROOT}/shots/fit-${name}-result-en.png` }); await q.click('#bLang')
   for (const [v, r] of Object.entries(views)) await t(`一画面に収まる ${name} ${w}x${h} ${v}`, async () => { expect(!r.over.length, r) })
   await t(`${name}: はみ出し・エラーなし`, async () => { const o = await overflow(q); expect(o.sw <= o.W && !o.bad.length && !q.errs.length, JSON.stringify(o) + q.errs.join('|')) })
+  await t(`${name}: ハンコが見出し・本文に重ならず字が折れない（全辞令×日英）`, async () => { await q.waitForTimeout(400); const b = await q.evaluate(HANKO); expect(!b.length, b.slice(0, 4)) })
   await q.close()
 }
 await browser.close()
