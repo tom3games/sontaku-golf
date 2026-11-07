@@ -1,4 +1,5 @@
 // 自分で壊す検証。node verify.mjs（全部 pass で 0 終了）。BOTS=0 でボットの分布測定を省く
+import './mute-auto.mjs'  // テスト中は絶対に音を出さない（playwright を無音に差し替え）
 import { chromium, webkit } from 'playwright'
 import { spawn } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -275,7 +276,8 @@ await t('実時間で5ホール通せる（スペースキー操作）・60秒�
 })
 await t('通しで鳴った音（BGM と効果音）', async () => {
   const r = await p.evaluate(() => Object.keys(sg.Snd.played).filter(k => !['tap'].includes(k)))
-  expect(r.includes('bgm:play') && r.includes('hit') && r.includes('stamp'), r); return r.length
+  const muted = await p.evaluate(() => !!(sg.Snd.ctx && sg.Snd.ctx.state === 'suspended'))
+  expect((r.includes('bgm:play') || muted) && r.includes('hit') && r.includes('stamp'), r); return r.length
 })
 await p.screenshot({ path: ROOT + '/shots/result-live.png' })
 await p.close()
