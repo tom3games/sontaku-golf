@@ -152,7 +152,7 @@ await t('ブラウザの拡大が起きない（viewport・ピンチ・Ctrl+ホ�
 })
 await t('OGP 一式がある（画像は ?v= つきの絶対URL）', async () => {
   const r = await p.evaluate(() => ({ list: ['og:title', 'og:description', 'og:image', 'og:url', 'og:type'].map(k => !!document.querySelector(`meta[property="${k}"]`)).concat(!!document.querySelector('meta[name="twitter:card"]')), img: document.querySelector('meta[property="og:image"]').content, url: document.querySelector('meta[property="og:url"]').content }))
-  expect(r.list.every(Boolean) && r.img === 'https://tom3games.github.io/sontaku-golf/og.png?v=1' && r.url === 'https://tom3games.github.io/sontaku-golf/', r)
+  expect(r.list.every(Boolean) && r.img === 'https://tom3games.com/play/sontaku-golf/og.png?v=1' && r.url === 'https://tom3games.com/play/sontaku-golf/', r)
 })
 await t('タイトルの3Dが描けている（輝度の散らばり）', async () => { await p.waitForTimeout(600); const v = await glVariance(p); expect(v > 150, v); return v })
 await t('物理が決まった結果を返す（同じ入力で同じ着地）', async () => {
