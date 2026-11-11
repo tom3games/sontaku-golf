@@ -34,7 +34,7 @@ button{font-family:inherit;color:inherit;font-size:inherit}
 :focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 #gl{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0;touch-action:none}
 
-.view{position:fixed;inset:0;z-index:5;height:100svh;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(60px,calc(env(safe-area-inset-top) + 54px)) 16px max(18px,calc(env(safe-area-inset-bottom) + 14px))}
+.view{position:fixed;inset:0;z-index:5;height:100svh;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(60px,calc(env(safe-area-inset-top) + 54px)) 16px max(18px,calc(calc(env(safe-area-inset-bottom) + var(--inapp-bot,0px)) + 14px))}
 .btn{position:relative;overflow:hidden;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:900;font-size:18px;letter-spacing:.04em;border:0;border-radius:16px;min-height:54px;padding:0 20px;cursor:pointer;width:100%;
   background:var(--paper);color:var(--ink);box-shadow:0 5px 0 #b9a888,0 10px 18px rgba(0,0,0,.2);transition:transform .07s,box-shadow .07s,filter .15s}
 .btn::before{content:"";position:absolute;left:8px;right:8px;top:4px;height:44%;border-radius:12px 12px 40% 40%/12px 12px 14px 14px;background:linear-gradient(rgba(255,255,255,.45),rgba(255,255,255,0));pointer-events:none}
@@ -117,7 +117,7 @@ button{font-family:inherit;color:inherit;font-size:inherit}
 #talk .bubble{font-size:14px;padding:7px 11px}
 #me{display:none;font-weight:900;font-size:13px;color:#fff;text-shadow:0 2px 3px rgba(0,0,0,.6);max-width:100%}
 #me.on{display:block}
-#bottom{position:absolute;left:0;right:0;bottom:0;padding:0 max(10px,env(safe-area-inset-right)) max(12px,calc(env(safe-area-inset-bottom) + 8px)) max(10px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:8px;align-items:stretch}
+#bottom{position:absolute;left:0;right:0;bottom:0;padding:0 max(10px,env(safe-area-inset-right)) max(12px,calc(calc(env(safe-area-inset-bottom) + var(--inapp-bot,0px)) + 8px)) max(10px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:8px;align-items:stretch}
 #target{align-self:center;background:var(--paper);border:3px solid var(--ink);border-radius:99px;padding:4px 14px;font-weight:900;font-size:14px;box-shadow:0 3px 0 rgba(0,0,0,.25);white-space:nowrap;display:flex;gap:6px;align-items:center}
 #target i{display:inline-block;width:18px;height:8px;border-radius:4px;background:var(--gold);box-shadow:0 0 0 2px var(--ink)}
 #ctrl{display:flex;gap:8px;align-items:center}
@@ -141,7 +141,7 @@ button{font-family:inherit;color:inherit;font-size:inherit}
 #bShot.on{background:radial-gradient(circle at 40% 35%,#ffe27a,var(--gold) 60%,var(--gold-dk));box-shadow:0 6px 0 var(--gold-dk),0 0 24px rgba(255,197,61,.8),inset 0 0 0 4px rgba(255,255,255,.6)}
 #bShot:disabled{filter:grayscale(.8) brightness(.8)}
 #ctrl.off{opacity:.45}
-#ff{position:absolute;left:50%;bottom:max(110px,calc(env(safe-area-inset-bottom) + 104px));transform:translateX(-50%);background:rgba(20,36,58,.7);color:#fff;font-weight:900;font-size:12px;padding:4px 12px;border-radius:99px;white-space:nowrap}
+#ff{position:absolute;left:50%;bottom:max(110px,calc(calc(env(safe-area-inset-bottom) + var(--inapp-bot,0px)) + 104px));transform:translateX(-50%);background:rgba(20,36,58,.7);color:#fff;font-weight:900;font-size:12px;padding:4px 12px;border-radius:99px;white-space:nowrap}
 #banner{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;width:min(94vw,640px)}
 #banner .b1{display:inline-block;font-family:var(--disp);font-size:clamp(30px,min(10vw,9vh),64px);line-height:1.15;color:#fff;padding:4px 18px 8px;
   text-shadow:3px 3px 0 var(--ink),-2px -2px 0 var(--ink),2px -2px 0 var(--ink),-2px 2px 0 var(--ink),0 6px 0 var(--ink)}
@@ -219,7 +219,7 @@ html[lang=en] .hanko{--hr:-6deg;aspect-ratio:auto;width:clamp(118px,min(34vw,22v
 }
 /* 背の低い横画面: 2列 */
 @media (max-height:560px) and (min-aspect-ratio:1/1){
-  .view{padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(10px,env(safe-area-inset-bottom))}
+  .view{padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(10px,calc(env(safe-area-inset-bottom) + var(--inapp-bot,0px)))}
   #vTitle{justify-content:center}
   .tWrap{width:min(820px,100%);display:grid;grid-template-columns:1fr minmax(0,1fr);gap:10px 22px;align-items:center;padding-right:100px}
   .logo{grid-column:1;grid-row:1/4;margin:0;align-self:start}
@@ -245,8 +245,8 @@ html[lang=en] .hanko{--hr:-6deg;aspect-ratio:auto;width:clamp(118px,min(34vw,22v
   #target{order:0;align-self:flex-end;margin-bottom:12px;font-size:12px;flex:none}
   #ctrl{flex:1}
   .aimB{width:46px;height:46px}#gauge{height:48px}#bShot{width:62px;height:62px}#bShot svg.clk{width:72px;height:72px}
-  #ff{bottom:max(76px,calc(env(safe-area-inset-bottom) + 70px))}
-  #tut{top:auto;bottom:max(80px,calc(env(safe-area-inset-bottom) + 74px))}
+  #ff{bottom:max(76px,calc(calc(env(safe-area-inset-bottom) + var(--inapp-bot,0px)) + 70px))}
+  #tut{top:auto;bottom:max(80px,calc(calc(env(safe-area-inset-bottom) + var(--inapp-bot,0px)) + 74px))}
   #vResult{padding-top:max(10px,env(safe-area-inset-top))}
   .rGrid{width:min(860px,100%);display:grid;grid-template-columns:1.15fr 1fr;grid-template-rows:auto auto;gap:8px 14px;align-items:center;padding-right:100px}
   .order{grid-row:1/3;padding:8px 14px}
@@ -384,6 +384,6 @@ html[lang=en] .hanko{--hr:-6deg;aspect-ratio:auto;width:clamp(118px,min(34vw,22v
 <script src="data.js?v=3"></script>
 <script src="snd.js?v=3"></script>
 <script type="module" src="game.js?v=3"></script>
-<script src="support.js?v=4" data-ja="ゴルフボール" data-en="a golf ball"></script>
+<script src="support.js?v=5" data-ja="ゴルフボール" data-en="a golf ball"></script>
 </body>
 </html>
